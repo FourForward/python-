@@ -1,0 +1,217 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh_Hans">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>为模型提供初始化的数据 &#8212; Django 3.1.1.dev 文档</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Django 使用旧有的数据库" href="legacy-databases.html" />
+    <link rel="prev" title="发送错误" href="error-reporting.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 3.1.1.dev 文档</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="error-reporting.html" title="发送错误">previous</a>
+     |
+    <a href="index.html" title="操作指南" accesskey="U">up</a>
+   |
+    <a href="legacy-databases.html" title="Django 使用旧有的数据库">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-initial-data">
+            
+  <div class="section" id="s-providing-initial-data-for-models">
+<span id="providing-initial-data-for-models"></span><h1>为模型提供初始化的数据<a class="headerlink" href="#providing-initial-data-for-models" title="永久链接至标题">¶</a></h1>
+<p>第一次配置应用时，用硬编码的数据预备数据库有时很很有用。你能通过迁移和固定内容提供初始数据。</p>
+<div class="section" id="s-providing-initial-data-with-migrations">
+<span id="providing-initial-data-with-migrations"></span><h2>通过迁移提供初始数据<a class="headerlink" href="#providing-initial-data-with-migrations" title="永久链接至标题">¶</a></h2>
+<p>若你想为应用自动载入初始数据，创建一个 <a class="reference internal" href="../topics/migrations.html#data-migrations"><span class="std std-ref">数据迁移</span></a>。创建测试数据库时会运行迁移，所以可以用这里的数据， <a class="reference internal" href="../topics/testing/overview.html#test-case-serialized-rollback"><span class="std std-ref">一些限制</span></a> 主题。</p>
+</div>
+<div class="section" id="s-providing-data-with-fixtures">
+<span id="s-initial-data-via-fixtures"></span><span id="providing-data-with-fixtures"></span><span id="initial-data-via-fixtures"></span><h2>通过固定内容提供数据<a class="headerlink" href="#providing-data-with-fixtures" title="永久链接至标题">¶</a></h2>
+<p>你也能通过固定内容提供数据，不过，这些数据不会自动加载，除非你使用 <a class="reference internal" href="../topics/testing/tools.html#django.test.TransactionTestCase.fixtures" title="django.test.TransactionTestCase.fixtures"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TransactionTestCase.fixtures</span></code></a>。</p>
+<p>固定内容是一个 Django 知道如何导入数据库的集合。若你已有一些可用数据，最直接的创建固定内容的方式是使用  <a class="reference internal" href="../ref/django-admin.html#django-admin-dumpdata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">dumpdata</span></code></a> 命令。或者，你可以手写固定内容；固定数据能被写作 JSON，XML 或 YAML （要求已安装 <a class="reference external" href="https://pyyaml.org/">PyYAML</a>）文档。 <a class="reference internal" href="../topics/serialization.html"><span class="doc">序列化文档</span></a> 拥有更多这些支持的 <a class="reference internal" href="../topics/serialization.html#serialization-formats"><span class="std std-ref">序列化格式</span></a> 的细节信息。</p>
+<p>As an example, though, here's what a fixture for a <code class="docutils literal notranslate"><span class="pre">Person</span></code> model might look
+like in JSON:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="o">:</span> <span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pk&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;fields&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;first_name&quot;</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;last_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Lennon&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;model&quot;</span><span class="o">:</span> <span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pk&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;fields&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;first_name&quot;</span><span class="o">:</span> <span class="s2">&quot;Paul&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;last_name&quot;</span><span class="o">:</span> <span class="s2">&quot;McCartney&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>以下是一样的固定内容，YAML 格式：</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">model</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">myapp.person</span>
+  <span class="nt">pk</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="nt">fields</span><span class="p">:</span>
+    <span class="nt">first_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">John</span>
+    <span class="nt">last_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Lennon</span>
+<span class="p p-Indicator">-</span> <span class="nt">model</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">myapp.person</span>
+  <span class="nt">pk</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+  <span class="nt">fields</span><span class="p">:</span>
+    <span class="nt">first_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Paul</span>
+    <span class="nt">last_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">McCartney</span>
+</pre></div>
+</div>
+<p>你会将该数据存入应用中的 <code class="docutils literal notranslate"><span class="pre">fixtures</span></code> 字典。</p>
+<p>You can load data by calling <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">loaddata</span></code></a>
+<code class="docutils literal notranslate"><span class="pre">&lt;fixturename&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;fixturename&gt;</span></code> is the name of the fixture file
+you've created. Each time you run <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">loaddata</span></code></a>, the data will be read
+from the fixture and re-loaded into the database. Note this means that if you
+change one of the rows created by a fixture and then run <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">loaddata</span></code></a>
+again, you'll wipe out any changes you've made.</p>
+<div class="section" id="s-where-django-finds-fixture-files">
+<span id="where-django-finds-fixture-files"></span><h3>Django 从哪里寻找固定内容文件<a class="headerlink" href="#where-django-finds-fixture-files" title="永久链接至标题">¶</a></h3>
+<p>默认情况下，Django 在每个应用的 <code class="docutils literal notranslate"><span class="pre">fixtures</span></code> 目录中查找固定内容。你可以将配置项 <a class="reference internal" href="../ref/settings.html#std:setting-FIXTURE_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FIXTURE_DIRS</span></code></a> 设为一个 Django 需要额外寻找的目录列表。</p>
+<p><a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">loaddata</span></code></a> 时，你也能指定一个到固定内容文件的路径，这将会覆盖查找常规目录的行为。</p>
+<div class="admonition seealso">
+<p class="first admonition-title">参见</p>
+<p class="last">固定内容通常备 <a class="reference internal" href="../topics/testing/tools.html#topics-testing-fixtures"><span class="std std-ref">测试框架</span></a> 用于创建永久的测试环境。</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">为模型提供初始化的数据</a><ul>
+<li><a class="reference internal" href="#providing-initial-data-with-migrations">通过迁移提供初始数据</a></li>
+<li><a class="reference internal" href="#providing-data-with-fixtures">通过固定内容提供数据</a><ul>
+<li><a class="reference internal" href="#where-django-finds-fixture-files">Django 从哪里寻找固定内容文件</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>上一个主题</h4>
+  <p class="topless"><a href="error-reporting.html"
+                        title="上一章">发送错误</a></p>
+  <h4>下一个主题</h4>
+  <p class="topless"><a href="legacy-databases.html"
+                        title="下一章">Django 使用旧有的数据库</a></p>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/initial-data.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="转向" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">8月 11, 2020</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="error-reporting.html" title="发送错误">previous</a>
+     |
+    <a href="index.html" title="操作指南" accesskey="U">up</a>
+   |
+    <a href="legacy-databases.html" title="Django 使用旧有的数据库">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

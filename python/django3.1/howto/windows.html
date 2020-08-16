@@ -1,0 +1,235 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh_Hans">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>如何在 Windows 上安装 Django &#8212; Django 3.1.1.dev 文档</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="编写数据库迁移语句" href="writing-migrations.html" />
+    <link rel="prev" title="部署静态文件" href="static-files/deployment.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 3.1.1.dev 文档</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="static-files/deployment.html" title="部署静态文件">previous</a>
+     |
+    <a href="index.html" title="操作指南" accesskey="U">up</a>
+   |
+    <a href="writing-migrations.html" title="编写数据库迁移语句">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-windows">
+            
+  <div class="section" id="s-how-to-install-django-on-windows">
+<span id="how-to-install-django-on-windows"></span><h1>如何在 Windows 上安装 Django<a class="headerlink" href="#how-to-install-django-on-windows" title="永久链接至标题">¶</a></h1>
+<p>This document will guide you through installing Python 3.8 and Django on
+Windows. It also provides instructions for setting up a virtual environment,
+which makes it easier to work on Python projects. This is meant as a beginner's
+guide for users working on Django projects and does not reflect how Django
+should be installed when developing patches for Django itself.</p>
+<p>The steps in this guide have been tested with Windows 10. In other
+versions, the steps would be similar. You will need to be familiar with using
+the Windows command prompt.</p>
+<div class="section" id="s-install-python">
+<span id="s-install-python-windows"></span><span id="install-python"></span><span id="install-python-windows"></span><h2>安装Python<a class="headerlink" href="#install-python" title="永久链接至标题">¶</a></h2>
+<p>Django is a Python web framework, thus requiring Python to be installed on your
+machine. At the time of writing, Python 3.8 is the latest version.</p>
+<p>To install Python on your machine go to <a class="reference external" href="https://python.org/downloads/">https://python.org/downloads/</a>. The
+website should offer you a download button for the latest Python version.
+Download the executable installer and run it. Check the boxes next to &quot;Install
+launcher for all users (recommended)&quot; then click &quot;Install Now&quot;.</p>
+<p>安装后，打开命令提示符，检查 Python 版本是否与你装的一致，通过运行:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py --version
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">参见</p>
+<p class="last">想知晓更多细节，请查看 <a class="reference external" href="https://docs.python.org/3/using/windows.html" title="(在 Python v3.8)"><span>Using Python on Windows</span></a> 文档。</p>
+</div>
+</div>
+<div class="section" id="s-about-pip">
+<span id="about-pip"></span><h2>关于 <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#about-pip" title="永久链接至标题">¶</a></h2>
+<p><a class="reference external" href="https://pypi.org/project/pip/">pip</a> is a package manager for Python and is included by default with the
+Python installer. It helps to install and uninstall Python packages
+(such as Django!). For the rest of the installation, we'll use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to
+install Python packages from the command line.</p>
+</div>
+<div class="section" id="s-setting-up-a-virtual-environment">
+<span id="s-virtualenvironment"></span><span id="setting-up-a-virtual-environment"></span><span id="virtualenvironment"></span><h2>Setting up a virtual environment<a class="headerlink" href="#setting-up-a-virtual-environment" title="永久链接至标题">¶</a></h2>
+<p>It is best practice to provide a dedicated environment for each Django project
+you create. There are many options to manage environments and packages within
+the Python ecosystem, some of which are recommended in the <a class="reference external" href="https://packaging.python.org/guides/tool-recommendations/">Python
+documentation</a>.
+Python itself comes with <a class="reference external" href="https://docs.python.org/3/tutorial/venv.html" title="(在 Python v3.8)"><span class="xref std std-doc">venv</span></a> for managing
+environments which we will use for this guide.</p>
+<p>To create a virtual environment for your project, open a new command prompt,
+navigate to the folder where you want to create your project and then enter the
+following:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m venv project-name
+</pre></div>
+</div>
+<p>This will create a folder called 'project-name' if it does not already exist
+and setup the virtual environment. To activate the environment, run:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> project-name\Scripts\activate.bat
+</pre></div>
+</div>
+<p>The virtual environment will be activated and you'll see &quot;(project-name)&quot; next
+to the command prompt to designate that. Each time you start a new command
+prompt, you'll need to activate the environment again.</p>
+</div>
+<div class="section" id="s-install-django">
+<span id="install-django"></span><h2>安装 Django<a class="headerlink" href="#install-django" title="永久链接至标题">¶</a></h2>
+<p>Django 可以轻松地在你的虚拟环境中使用 <code class="docutils literal notranslate"><span class="pre">pip</span></code> 安装。</p>
+<p>在命令提示行中，确认虚拟环境是激活的，然后运行以下命令:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m pip install Django
+</pre></div>
+</div>
+<p>这将下载并安装最新的 Django 发布版本。</p>
+<p>安装完成后，你可以在命令提示符运行 <code class="docutils literal notranslate"><span class="pre">django-admin</span> <span class="pre">--version</span></code> 验证你安装的 Django。</p>
+<p>参考 <span class="xref std std-ref">数据库安装</span> 了解如何通过 Django 安装数据库。</p>
+</div>
+<div class="section" id="s-common-pitfalls">
+<span id="common-pitfalls"></span><h2>常见失误<a class="headerlink" href="#common-pitfalls" title="永久链接至标题">¶</a></h2>
+<ul>
+<li><p class="first">若 <code class="docutils literal notranslate"><span class="pre">django-admin</span></code> 无论输入啥参数都只显示帮助信息，这可能是一个 Windos 的文件关联问题。检查 <code class="docutils literal notranslate"><span class="pre">PATH</span></code> 中是否不止一个用于运行 Python 脚本的环境变量。该问题通常在安装了多个 Python 版本时出现。</p>
+</li>
+<li><p class="first">若你通过代理来连接互联网，运行命令 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">Django</span></code> 时可能会出现问题。在命令提示符中为代理配置如下环境变量:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="k">set</span> <span class="nv">http_proxy</span><span class="p">=</span>http://username:password@proxyserver:proxyport
+<span class="gp">...\&gt;</span> <span class="k">set</span> <span class="nv">https_proxy</span><span class="p">=</span>https://username:password@proxyserver:proxyport
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">如何在 Windows 上安装 Django</a><ul>
+<li><a class="reference internal" href="#install-python">安装Python</a></li>
+<li><a class="reference internal" href="#about-pip">关于 <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
+<li><a class="reference internal" href="#setting-up-a-virtual-environment">Setting up a virtual environment</a></li>
+<li><a class="reference internal" href="#install-django">安装 Django</a></li>
+<li><a class="reference internal" href="#common-pitfalls">常见失误</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>上一个主题</h4>
+  <p class="topless"><a href="static-files/deployment.html"
+                        title="上一章">部署静态文件</a></p>
+  <h4>下一个主题</h4>
+  <p class="topless"><a href="writing-migrations.html"
+                        title="下一章">编写数据库迁移语句</a></p>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/windows.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="转向" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">8月 11, 2020</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="static-files/deployment.html" title="部署静态文件">previous</a>
+     |
+    <a href="index.html" title="操作指南" accesskey="U">up</a>
+   |
+    <a href="writing-migrations.html" title="编写数据库迁移语句">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

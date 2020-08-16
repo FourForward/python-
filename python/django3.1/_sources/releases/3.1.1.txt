@@ -1,0 +1,22 @@
+==========================
+Django 3.1.1 release notes
+==========================
+
+*Expected September 1, 2020*
+
+Django 3.1.1 fixes several bugs in 3.1.
+
+Bugfixes
+========
+
+* Fixed wrapping of translated action labels in the admin's navigation sidebar
+  for East Asian languages (:ticket:`31853`).
+
+* Fixed wrapping of long model names in the admin's navigation sidebar
+  (:ticket:`31854`).
+
+* Fixed encoding session data while upgrading multiple instances of the same
+  project to Django 3.1 (:ticket:`31864`).
+
+* Adjusted admin's navigation sidebar template to reduce debug logging when
+  rendering (:ticket:`31865`).

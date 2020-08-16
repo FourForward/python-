@@ -1,0 +1,506 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh_Hans">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>应用 &#8212; Django 3.1.1.dev 文档</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="系统检查框架" href="checks.html" />
+    <link rel="prev" title="API参考" href="index.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 3.1.1.dev 文档</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="API参考">previous</a>
+     |
+    <a href="index.html" title="API参考" accesskey="U">up</a>
+   |
+    <a href="checks.html" title="系统检查框架">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-applications">
+            
+  <div class="section" id="s-module-django.apps">
+<span id="s-applications"></span><span id="module-django.apps"></span><span id="applications"></span><h1>应用<a class="headerlink" href="#module-django.apps" title="永久链接至标题">¶</a></h1>
+<p>Django 包含一个已安装应用配置记录，能够存储配置和内省。它同时还维护一个可用的 <a class="reference internal" href="../topics/db/models.html"><span class="doc">模型</span></a> 列表。</p>
+<p>此注册表称为:attr:应用`~django.apps.apps` ，并且它可用于:mod:django.apps::。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">django.apps</span> <span class="k">import</span> <span class="n">apps</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apps</span><span class="o">.</span><span class="n">get_app_config</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">verbose_name</span>
+<span class="go">&#39;Administration&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="s-projects-and-applications">
+<span id="projects-and-applications"></span><h2>项目和应用<a class="headerlink" href="#projects-and-applications" title="永久链接至标题">¶</a></h2>
+<p>术语 <strong>project（项目）</strong> 指的是一个 Django web 应用，该项目的Python包主要包含配置模块，但通常也包含其他内容。例如，当你在命令行执行 <code class="docutils literal notranslate"><span class="pre">django-admin</span> <span class="pre">startproject</span> <span class="pre">mysite</span></code> 命令时，你会得到一个名为 <code class="docutils literal notranslate"><span class="pre">mysite</span></code>&nbsp; 的项目目录，其中包含一个同样名为 <code class="docutils literal notranslate"><span class="pre">mysite</span></code> 的Python包，Python包内包括 <code class="docutils literal notranslate"><span class="pre">settings.py</span></code>、 <code class="docutils literal notranslate"><span class="pre">urls.py</span></code>、 <code class="docutils literal notranslate"><span class="pre">asgi.py</span></code> 和 <a href="#id1"><span class="problematic" id="id2">``</span></a>wsgi.py``等文件。项目的Python包通常也会扩展从而包含一些其他内容，比如fixture、CSS，以及与特定应用绑定的模板等。</p>
+<p>一个 <strong>项目的根目录</strong> (包含 <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> 文件的目录) 通常是所有项目应用程序的容器，应用不能独立安装。</p>
+<p>术语 <strong>application</strong> 指的是提供了一些功能的 Python 包。应用 <a class="reference internal" href="../intro/reusable-apps.html"><span class="doc">可在多个项目中重用</span></a>。</p>
+<p>应用程序包括模型，视图，模板，模板标签，静态文件，URL，中间件等的一些组合。它们通常使用 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 选项加入到项目中，也可以使用其他机制，如 URLconf， <a class="reference internal" href="settings.html#std:setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 配置或模板继承。</p>
+<p>了解Django应用程序是一组与框架的各个部分进行交互的代码，这一点很重要。没有诸如“应用程序”对象之类的东西。但是，在某些Django需要与已安装的应用程序进行交互的地方，主要用于配置和内省。这就是为什么应用程序注册表在每个安装的应用程序的:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~django.apps.AppConfig`实例中维护元数据的原因。</p>
+<p>一个项目包可以自由的作为一个应用程序并包含一些模型等（前提是，需要把它加入 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a>）。</p>
+</div>
+<div class="section" id="s-configuring-applications">
+<span id="s-configuring-applications-ref"></span><span id="configuring-applications"></span><span id="configuring-applications-ref"></span><h2>配置应用程序<a class="headerlink" href="#configuring-applications" title="永久链接至标题">¶</a></h2>
+<p>配置一个应用程序，需要继承 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a>，将子类的点式路径加入 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 中。</p>
+<p>当 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 包含当前路径到一个应用程序模块的路径时，Django 会检查该模块下的 <code class="docutils literal notranslate"><span class="pre">default_app_config</span></code> 变量。</p>
+<p>如果已经定义，它是当前路径到到达该应用程序子类 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 的路径。</p>
+<p>如果没有 <code class="docutils literal notranslate"><span class="pre">default_app_config</span></code>，Django 会使用基类 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a>。</p>
+<p><code class="docutils literal notranslate"><span class="pre">default_app_config</span></code> 允许 Django 1.7 之前的应用程序（例如 <code class="docutils literal notranslate"><span class="pre">django.contrib.admin</span></code>）在不要求用户更新 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 的情况下就可以加入 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 特性。</p>
+<p>新的应用程序应该避免使用 <code class="docutils literal notranslate"><span class="pre">default_app_config</span></code>。相反，它们应该在 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 中显式地配置对应 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 子类的完整点式路径。</p>
+<div class="section" id="s-for-application-authors">
+<span id="for-application-authors"></span><h3>对于应用作者<a class="headerlink" href="#for-application-authors" title="永久链接至标题">¶</a></h3>
+<p>如果您正在创建一个名为 “Rock”n“roll” 的可插拔应用程序，那么这边将告诉您将如何为管理后台提供一个合适的名称：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># rock_n_roll/apps.py</span>
+
+<span class="kn">from</span> <span class="nn">django.apps</span> <span class="k">import</span> <span class="n">AppConfig</span>
+
+<span class="k">class</span> <span class="nc">RockNRollConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;rock_n_roll&#39;</span>
+    <span class="n">verbose_name</span> <span class="o">=</span> <span class="s2">&quot;Rock ’n’ roll&quot;</span>
+</pre></div>
+</div>
+<p>你可以通过如下方式使应用程序默认加载这个 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># rock_n_roll/__init__.py</span>
+
+<span class="n">default_app_config</span> <span class="o">=</span> <span class="s1">&#39;rock_n_roll.apps.RockNRollConfig&#39;</span>
+</pre></div>
+</div>
+<p>当 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 包含 <code class="docutils literal notranslate"><span class="pre">'rock_n_roll'</span></code> 时会使用 <code class="docutils literal notranslate"><span class="pre">RockNRollConfig</span></code>。这允许你充分利用 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 的功能特性，无需使你的用户去更新他们的 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 配置。除此之外，最好避免使用 <code class="docutils literal notranslate"><span class="pre">default_app_config</span></code>，而是使用后续介绍的在 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 中指定应用配置类。</p>
+<p>You can also tell your users to put <code class="docutils literal notranslate"><span class="pre">'rock_n_roll.apps.RockNRollConfig'</span></code> in
+their <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> setting. You can even provide several different
+<a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> subclasses with different behaviors and allow
+your users to choose one via their <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> setting.</p>
+<p>惯例是将配置类放在应用程序名为 <code class="docutils literal notranslate"><span class="pre">apps</span></code> 的子模块中。但是，这不是 Django 强制规定的。</p>
+<p>你必须包含 attr:~django.apps.AppConfig.name 属性，Django 用它决定这个配置会应用于哪个应用。你定义任何在 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> API 参考中记录的属性。</p>
+<div class="admonition note">
+<p class="first admonition-title">注解</p>
+<p>若你在应用的 <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> 中导入了应用注册信息，名称 <code class="docutils literal notranslate"><span class="pre">apps</span></code> 会与子模块 <code class="docutils literal notranslate"><span class="pre">apps</span></code> 冲突。最好的办法是将此段带入移入子模块，再导入它。折中方案是导入后取个别名:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.apps</span> <span class="k">import</span> <span class="n">apps</span> <span class="k">as</span> <span class="n">django_apps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-for-application-users">
+<span id="for-application-users"></span><h3>对于应用使用者<a class="headerlink" href="#for-application-users" title="永久链接至标题">¶</a></h3>
+<p>项目中直接使用 &quot;Rock ’n’ roll&quot;，其名字会是 <code class="docutils literal notranslate"><span class="pre">anthology</span></code>，但是你可能期望显示 &quot;Jazz Manouche&quot;，这需要你提供自定义配置:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># anthology/apps.py</span>
+
+<span class="kn">from</span> <span class="nn">rock_n_roll.apps</span> <span class="k">import</span> <span class="n">RockNRollConfig</span>
+
+<span class="k">class</span> <span class="nc">JazzManoucheConfig</span><span class="p">(</span><span class="n">RockNRollConfig</span><span class="p">):</span>
+    <span class="n">verbose_name</span> <span class="o">=</span> <span class="s2">&quot;Jazz Manouche&quot;</span>
+
+<span class="c1"># anthology/settings.py</span>
+
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;anthology.apps.JazzManoucheConfig&#39;</span><span class="p">,</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>同样，在名为 <code class="docutils literal notranslate"><span class="pre">app</span></code> 的子模块中定义项目配置类是一种约定俗成的惯例，但不强求。</p>
+</div>
+</div>
+<div class="section" id="s-application-configuration">
+<span id="application-configuration"></span><h2>应用配置<a class="headerlink" href="#application-configuration" title="永久链接至标题">¶</a></h2>
+<dl class="class">
+<dt id="django.apps.AppConfig">
+<em class="property">class </em><code class="descname">AppConfig</code><a class="reference internal" href="../_modules/django/apps/config.html#AppConfig"><span class="viewcode-link">[源代码]</span></a><a class="headerlink" href="#django.apps.AppConfig" title="永久链接至目标">¶</a></dt>
+<dd><p>应用程序配置对象存储了应用的元数据。某些属性可以在 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 的子类中配置。而其它 Django 设置好的配置是只读的。</p>
+</dd></dl>
+
+<div class="section" id="s-configurable-attributes">
+<span id="configurable-attributes"></span><h3>可配置属性<a class="headerlink" href="#configurable-attributes" title="永久链接至标题">¶</a></h3>
+<dl class="attribute">
+<dt id="django.apps.AppConfig.name">
+<code class="descclassname">AppConfig.</code><code class="descname">name</code><a class="headerlink" href="#django.apps.AppConfig.name" title="永久链接至目标">¶</a></dt>
+<dd><p>指向此应用的完整的 Python 格式的路径，如 <code class="docutils literal notranslate"><span class="pre">'django.contrib.admin'</span></code>。</p>
+<p>此属性定义配置适用的应用程序。每个 'django.apps.AppConfig` 子类都必须包含此项。</p>
+<p>它必须在整个 Django 项目中唯一。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.apps.AppConfig.label">
+<code class="descclassname">AppConfig.</code><code class="descname">label</code><a class="headerlink" href="#django.apps.AppConfig.label" title="永久链接至目标">¶</a></dt>
+<dd><p>应用简称，如 <code class="docutils literal notranslate"><span class="pre">'admin'</span></code></p>
+<p>此属性允许在两个应用标签冲突时重命名其中一个的标签名。默认是 <code class="docutils literal notranslate"><span class="pre">name</span></code> 的最后一段。必须是一个有效的 Python 标识符。</p>
+<p>它必须在整个 Django 项目中唯一。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.apps.AppConfig.verbose_name">
+<code class="descclassname">AppConfig.</code><code class="descname">verbose_name</code><a class="headerlink" href="#django.apps.AppConfig.verbose_name" title="永久链接至目标">¶</a></dt>
+<dd><p>应用容易被人理解的名称，如 &quot;Administration&quot;。</p>
+<p>此属性默认值为 <code class="docutils literal notranslate"><span class="pre">label.title()</span></code>。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.apps.AppConfig.path">
+<code class="descclassname">AppConfig.</code><code class="descname">path</code><a class="headerlink" href="#django.apps.AppConfig.path" title="永久链接至目标">¶</a></dt>
+<dd><p>应用目录的文件系统路径，如 <code class="docutils literal notranslate"><span class="pre">'/usr/lib/pythonX.Y/dist-packages/django/contrib/admin'</span></code>。</p>
+<p>大多数情况下，Django 能自动检测并设置此属性，但你也能在 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 子类中申明此属性，显式地重写它。很少情况下要这么做；例如，若应用包是一个拥有多个路径的 <a class="reference internal" href="#namespace-package">命名空间</a>。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-read-only-attributes">
+<span id="read-only-attributes"></span><h3>只读属性<a class="headerlink" href="#read-only-attributes" title="永久链接至标题">¶</a></h3>
+<dl class="attribute">
+<dt id="django.apps.AppConfig.module">
+<code class="descclassname">AppConfig.</code><code class="descname">module</code><a class="headerlink" href="#django.apps.AppConfig.module" title="永久链接至目标">¶</a></dt>
+<dd><p>应用的根模块，如 <code class="docutils literal notranslate"><span class="pre">&lt;module</span> <span class="pre">'django.contrib.admin'</span> <span class="pre">from</span> <span class="pre">'django/contrib/admin/__init__.py'&gt;</span></code>。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.apps.AppConfig.models_module">
+<code class="descclassname">AppConfig.</code><code class="descname">models_module</code><a class="headerlink" href="#django.apps.AppConfig.models_module" title="永久链接至目标">¶</a></dt>
+<dd><p>包含模型的模块，如 <code class="docutils literal notranslate"><span class="pre">&lt;module</span> <span class="pre">'django.contrib.admin.models'</span> <span class="pre">from</span> <span class="pre">'django/contrib/admin/models.py'&gt;</span></code>。</p>
+<p>应用不包含 <code class="docutils literal notranslate"><span class="pre">models</span></code> 模块时，可能是 <code class="docutils literal notranslate"><span class="pre">None</span></code>。注意，数据库关联的信号，例如 <a class="reference internal" href="signals.html#django.db.models.signals.pre_migrate" title="django.db.models.signals.pre_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_migrate</span></code></a> 和 <a class="reference internal" href="signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> 仅在应用有 <code class="docutils literal notranslate"><span class="pre">models</span></code> 模块时发出。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-methods">
+<span id="methods"></span><h3>方法<a class="headerlink" href="#methods" title="永久链接至标题">¶</a></h3>
+<dl class="method">
+<dt id="django.apps.AppConfig.get_models">
+<code class="descclassname">AppConfig.</code><code class="descname">get_models</code>()<a class="reference internal" href="../_modules/django/apps/config.html#AppConfig.get_models"><span class="viewcode-link">[源代码]</span></a><a class="headerlink" href="#django.apps.AppConfig.get_models" title="永久链接至目标">¶</a></dt>
+<dd><p>为该应用返回一个可迭代的 <a class="reference internal" href="models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> 类。</p>
+<p>要求完整填写应用注册信息。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.AppConfig.get_model">
+<code class="descclassname">AppConfig.</code><code class="descname">get_model</code>(<em>model_name</em>, <em>require_ready=True</em>)<a class="reference internal" href="../_modules/django/apps/config.html#AppConfig.get_model"><span class="viewcode-link">[源代码]</span></a><a class="headerlink" href="#django.apps.AppConfig.get_model" title="永久链接至目标">¶</a></dt>
+<dd><p>返回指定 <code class="docutils literal notranslate"><span class="pre">model_name</span></code> 的 <a class="reference internal" href="models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>。 <code class="docutils literal notranslate"><span class="pre">model_name</span></code> 是大小写敏感的。</p>
+<p>如果应用中不存在此模块，则抛出 LookupError 异常。</p>
+<p>除 <code class="docutils literal notranslate"><span class="pre">require_ready</span></code> 参数为 <code class="docutils literal notranslate"><span class="pre">False</span></code> 的情况下，都必须完整设置注册信息。 <code class="docutils literal notranslate"><span class="pre">require_ready</span></code> 行为与 <a class="reference internal" href="#django.apps.apps.get_model" title="django.apps.apps.get_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apps.get_model()</span></code></a> 一致。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.AppConfig.ready">
+<code class="descclassname">AppConfig.</code><code class="descname">ready</code>()<a class="reference internal" href="../_modules/django/apps/config.html#AppConfig.ready"><span class="viewcode-link">[源代码]</span></a><a class="headerlink" href="#django.apps.AppConfig.ready" title="永久链接至目标">¶</a></dt>
+<dd><p>子类可以重写此方法来执行类似注册信号的初始化任务。只要注册表被填满就会调用此方法。</p>
+<p>虽然你不能在定义 <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> 类的模型层导入模型，但可以在 <code class="docutils literal notranslate"><span class="pre">ready()</span></code> 中导入，通过 <code class="docutils literal notranslate"><span class="pre">import</span></code> 语句或 <a class="reference internal" href="#django.apps.AppConfig.get_model" title="django.apps.AppConfig.get_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model()</span></code></a>。</p>
+<p>若你正在注册 <a class="reference internal" href="signals.html#module-django.db.models.signals" title="django.db.models.signals: Signals sent by the model system."><code class="xref py py-mod docutils literal notranslate"><span class="pre">model</span> <span class="pre">signals</span></code></a>，你可以通过字符串标签追踪发信者，而不是用模型类。</p>
+<p>举例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.apps</span> <span class="k">import</span> <span class="n">AppConfig</span>
+<span class="kn">from</span> <span class="nn">django.db.models.signals</span> <span class="k">import</span> <span class="n">pre_save</span>
+
+
+<span class="k">class</span> <span class="nc">RockNRollConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># importing model classes</span>
+        <span class="kn">from</span> <span class="nn">.models</span> <span class="k">import</span> <span class="n">MyModel</span>  <span class="c1"># or...</span>
+        <span class="n">MyModel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;MyModel&#39;</span><span class="p">)</span>
+
+        <span class="c1"># registering signals with the model&#39;s string label</span>
+        <span class="n">pre_save</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="s1">&#39;app_label.MyModel&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">尽管可以向上面介绍的那样访问模型类，但是要避免在 <a class="reference internal" href="#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> 实现中与数据库交互。这包括了那些会通过 <code class="docutils literal notranslate"><span class="pre">django.db.connection</span></code> 执行查询 (<a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a>， <a class="reference internal" href="models/instances.html#django.db.models.Model.delete" title="django.db.models.Model.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a>，管理器方法，等等) 和原生查询的模型方法。你的 <a class="reference internal" href="#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> 方法会在每个管理命令初始化阶段被执行。例如，虽然测试数据库的配置与生成环境配置是分开的， <code class="docutils literal notranslate"><span class="pre">manager.py</span> <span class="pre">test</span></code> 仍会对 <strong>生产环境</strong> 数据库执行一些查询操作。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">注解</p>
+<p class="last">在普通的初始化进程中， <code class="docutils literal notranslate"><span class="pre">ready</span></code> 方法仅被 Django 调用一次。但在一些特殊情况下，特别是针对已安装应用的测试中，可以会多次调用 <code class="docutils literal notranslate"><span class="pre">ready</span></code>。这种情况下，在 <code class="docutils literal notranslate"><span class="pre">AppConfig</span></code> 类中编写幂等方法或放入一个标志，避免那些只需运行一次的代码被多次执行。</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="s-namespace-packages-as-apps">
+<span id="s-namespace-package"></span><span id="namespace-packages-as-apps"></span><span id="namespace-package"></span><h3>命名空间包作为应用程序<a class="headerlink" href="#namespace-packages-as-apps" title="永久链接至标题">¶</a></h3>
+<p>没有__init__.py文件的Python包被称为“命名空间包”，并且可能分布在sys.path上不同位置的多个目录中（见：pep:'420'）</p>
+<p>Django应用程序需要一个单一的基本文件系统路径，Django（取决于配置）将在其中搜索模板、静态资产等。因此，只有在以下情况之一为真时，命名空间包才可能是Django应用程序：</p>
+<ol class="arabic simple">
+<li>名称空间包实际上只有一个位置（即不分布在多个目录中）。</li>
+<li>The <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> class used to configure the application
+has a <a class="reference internal" href="#django.apps.AppConfig.path" title="django.apps.AppConfig.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">path</span></code></a> class attribute, which is the
+absolute directory path Django will use as the single base path for the
+application.</li>
+</ol>
+<p>If neither of these conditions is met, Django will raise
+<a class="reference internal" href="exceptions.html#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a>.</p>
+</div>
+</div>
+<div class="section" id="s-application-registry">
+<span id="application-registry"></span><h2>注册应用<a class="headerlink" href="#application-registry" title="永久链接至标题">¶</a></h2>
+<dl class="data">
+<dt id="django.apps.apps">
+<code class="descname">apps</code><a class="headerlink" href="#django.apps.apps" title="永久链接至目标">¶</a></dt>
+<dd><p>应用程序注册表提供以下公共API。以下未列出的方法被视为私有方法，可能会更改，恕不另行通知。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="django.apps.apps.ready">
+<code class="descclassname">apps.</code><code class="descname">ready</code><a class="headerlink" href="#django.apps.apps.ready" title="永久链接至目标">¶</a></dt>
+<dd><p>Boolean attribute that is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> after the registry is fully
+populated and all <a class="reference internal" href="#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AppConfig.ready()</span></code></a> methods are called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.apps.get_app_configs">
+<code class="descclassname">apps.</code><code class="descname">get_app_configs</code>()<a class="headerlink" href="#django.apps.apps.get_app_configs" title="永久链接至目标">¶</a></dt>
+<dd><p>返回一个由django.apps.AppConfig类实例组成的可迭代对象</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.apps.get_app_config">
+<code class="descclassname">apps.</code><code class="descname">get_app_config</code>(<em>app_label</em>)<a class="headerlink" href="#django.apps.apps.get_app_config" title="永久链接至目标">¶</a></dt>
+<dd><p>Returns an <a class="reference internal" href="#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> for the application with the
+given <code class="docutils literal notranslate"><span class="pre">app_label</span></code>. Raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(在 Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> if no such application
+exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.apps.is_installed">
+<code class="descclassname">apps.</code><code class="descname">is_installed</code>(<em>app_name</em>)<a class="headerlink" href="#django.apps.apps.is_installed" title="永久链接至目标">¶</a></dt>
+<dd><p>Checks whether an application with the given name exists in the registry.
+<code class="docutils literal notranslate"><span class="pre">app_name</span></code> is the full name of the app, e.g. <code class="docutils literal notranslate"><span class="pre">'django.contrib.admin'</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="django.apps.apps.get_model">
+<code class="descclassname">apps.</code><code class="descname">get_model</code>(<em>app_label</em>, <em>model_name</em>, <em>require_ready=True</em>)<a class="headerlink" href="#django.apps.apps.get_model" title="永久链接至目标">¶</a></dt>
+<dd><p>Returns the <a class="reference internal" href="models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> with the given <code class="docutils literal notranslate"><span class="pre">app_label</span></code>
+and <code class="docutils literal notranslate"><span class="pre">model_name</span></code>. As a shortcut, this method also accepts a single
+argument in the form <code class="docutils literal notranslate"><span class="pre">app_label.model_name</span></code>. <code class="docutils literal notranslate"><span class="pre">model_name</span></code> is
+case-insensitive.</p>
+<p>Raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(在 Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> if no such application or model exists. Raises
+<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(在 Python v3.8)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> when called with a single argument that doesn't contain
+exactly one dot.</p>
+<p>Requires the app registry to be fully populated unless the
+<code class="docutils literal notranslate"><span class="pre">require_ready</span></code> argument is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">require_ready</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> allows looking up models
+<a class="reference internal" href="#app-loading-process"><span class="std std-ref">while the app registry is being populated</span></a>,
+specifically during the second phase where it imports models. Then
+<code class="docutils literal notranslate"><span class="pre">get_model()</span></code> has the same effect as importing the model. The main use
+case is to configure model classes with settings, such as
+<a class="reference internal" href="settings.html#std:setting-AUTH_USER_MODEL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">AUTH_USER_MODEL</span></code></a>.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">require_ready</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">get_model()</span></code> returns a model class
+that may not be fully functional (reverse accessors may be missing, for
+example) until the app registry is fully populated. For this reason, it's
+best to leave <code class="docutils literal notranslate"><span class="pre">require_ready</span></code> to the default value of <code class="docutils literal notranslate"><span class="pre">True</span></code> whenever
+possible.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="s-initialization-process">
+<span id="s-app-loading-process"></span><span id="initialization-process"></span><span id="app-loading-process"></span><h2>初始化进程<a class="headerlink" href="#initialization-process" title="永久链接至标题">¶</a></h2>
+<div class="section" id="s-how-applications-are-loaded">
+<span id="how-applications-are-loaded"></span><h3>应用是如何被加载的<a class="headerlink" href="#how-applications-are-loaded" title="永久链接至标题">¶</a></h3>
+<p>Django 启动后， <a class="reference internal" href="#django.setup" title="django.setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.setup()</span></code></a> 负责配置应用注册信息。</p>
+<dl class="function">
+<dt id="django.setup">
+<code class="descname">setup</code>(<em>set_prefix=True</em>)<a class="reference internal" href="../_modules/django.html#setup"><span class="viewcode-link">[源代码]</span></a><a class="headerlink" href="#django.setup" title="永久链接至目标">¶</a></dt>
+<dd><p>配置 Django：</p>
+<ul class="simple">
+<li>加载配置。</li>
+<li>设置日志。</li>
+<li>若 <code class="docutils literal notranslate"><span class="pre">set_prefix</span></code> 为 True，为 URL 处理器脚本增加前缀 <a class="reference internal" href="settings.html#std:setting-FORCE_SCRIPT_NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORCE_SCRIPT_NAME</span></code></a>，若未定义此项，则使用 <code class="docutils literal notranslate"><span class="pre">/</span></code>。</li>
+<li>初始化应用注册</li>
+</ul>
+<p>这个函数会被自动调用。</p>
+<ul class="simple">
+<li>当通过 Django 的 WSGI 支持运行 HTTP 服务。</li>
+<li>调用一个管理命令时。</li>
+</ul>
+<p>在其他情况下，必须显式调用它，例如在纯 Python 脚本中。</p>
+</dd></dl>
+
+<p>应用注册的初始化过程分三个阶段完成。在每个阶段，Django 根据应用在 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 中的顺序依次处理。</p>
+<ol class="arabic">
+<li><p class="first">首先，Django 导入 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 中各项条目。</p>
+<p>If it's an application configuration class, Django imports the root package
+of the application, defined by its <a class="reference internal" href="#django.apps.AppConfig.name" title="django.apps.AppConfig.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a> attribute. If
+it's a Python package, Django creates a default application configuration.</p>
+<p><em>在这情况下，你的代码不应该导入任何模型！</em></p>
+<p>换句话说，应用程序的根包和定义应用程序配置类的模块不能导入任何模型，即使是间接导入。</p>
+<p>严格来说，一旦应用配置完成加载后，Django 是允许导入模型。然而为了避免不必要的 <a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a>, 顺序约束。强烈建议在这个阶段不要导入任何模型。</p>
+<p>一旦这个阶段完成，可以使用 API 对应用程序配置（如：meth：〜apps.get_app_config() ）进行操作。</p>
+</li>
+<li><p class="first">然后 Django 尝试导入每个存在模型的应用程序中，继承了``models``的所有子模型。</p>
+<p>您必须在应用程序的“models.py”或“models / __ init __。py”中定义或导入所有模型。 否则，此时应用程序注册表可能不会完全加载，这可能会导致ORM出现故障。</p>
+<p>此步骤完成后，操作模型的 API，例如 <a class="reference internal" href="#django.apps.apps.get_model" title="django.apps.apps.get_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_model()</span></code></a>，就可以使用了。</p>
+</li>
+<li><p class="first">最后，Django运行每个应用程序配置的：meth：<a href="#id1"><span class="problematic" id="id2">`</span></a>〜AppConfig.ready（）`方法。</p>
+</li>
+</ol>
+</div>
+<div class="section" id="s-troubleshooting">
+<span id="s-applications-troubleshooting"></span><span id="troubleshooting"></span><span id="applications-troubleshooting"></span><h3>错误调试<a class="headerlink" href="#troubleshooting" title="永久链接至标题">¶</a></h3>
+<p>在初始化期间，这里有一些常见的错误你可能会遇上。</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="exceptions.html#django.core.exceptions.AppRegistryNotReady" title="django.core.exceptions.AppRegistryNotReady"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRegistryNotReady</span></code></a>: This happens when
+importing an application configuration or a models module triggers code that
+depends on the app registry.</p>
+<p>For example, <a class="reference internal" href="utils.html#django.utils.translation.gettext" title="django.utils.translation.gettext"><code class="xref py py-func docutils literal notranslate"><span class="pre">gettext()</span></code></a> uses the app
+registry to look up translation catalogs in applications. To translate at
+import time, you need <a class="reference internal" href="utils.html#django.utils.translation.gettext_lazy" title="django.utils.translation.gettext_lazy"><code class="xref py py-func docutils literal notranslate"><span class="pre">gettext_lazy()</span></code></a>
+instead. (Using <a class="reference internal" href="utils.html#django.utils.translation.gettext" title="django.utils.translation.gettext"><code class="xref py py-func docutils literal notranslate"><span class="pre">gettext()</span></code></a> would be a bug,
+because the translation would happen at import time, rather than at each
+request depending on the active language.)</p>
+<p>Executing database queries with the ORM at import time in models modules
+will also trigger this exception. The ORM cannot function properly until all
+models are available.</p>
+<p>如果你忘记在一个单独的Python脚本中调用函数`django.setup()`，也会发生异常。</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">ImportError:</span> <span class="pre">cannot</span> <span class="pre">import</span> <span class="pre">name</span> <span class="pre">...</span></code> This happens if the import sequence
+ends up in a loop.</p>
+<p>为了消除这些问题，您应该最大限度地减少模型模块之间的依赖关系，并在导入时尽可能减少复杂度。 为了避免在导入时执行代码，可以将其移入函数并缓存结果。 代码将在您首次需要结果时执行。 这个概念被称为“惰性求值”。</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">django.contrib.admin</span></code> automatically performs autodiscovery of <code class="docutils literal notranslate"><span class="pre">admin</span></code>
+modules in installed applications. To prevent it, change your
+<a class="reference internal" href="settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> to contain
+<code class="docutils literal notranslate"><span class="pre">'django.contrib.admin.apps.SimpleAdminConfig'</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">'django.contrib.admin'</span></code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">应用</a><ul>
+<li><a class="reference internal" href="#projects-and-applications">项目和应用</a></li>
+<li><a class="reference internal" href="#configuring-applications">配置应用程序</a><ul>
+<li><a class="reference internal" href="#for-application-authors">对于应用作者</a></li>
+<li><a class="reference internal" href="#for-application-users">对于应用使用者</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#application-configuration">应用配置</a><ul>
+<li><a class="reference internal" href="#configurable-attributes">可配置属性</a></li>
+<li><a class="reference internal" href="#read-only-attributes">只读属性</a></li>
+<li><a class="reference internal" href="#methods">方法</a></li>
+<li><a class="reference internal" href="#namespace-packages-as-apps">命名空间包作为应用程序</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#application-registry">注册应用</a></li>
+<li><a class="reference internal" href="#initialization-process">初始化进程</a><ul>
+<li><a class="reference internal" href="#how-applications-are-loaded">应用是如何被加载的</a></li>
+<li><a class="reference internal" href="#troubleshooting">错误调试</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>上一个主题</h4>
+  <p class="topless"><a href="index.html"
+                        title="上一章">API参考</a></p>
+  <h4>下一个主题</h4>
+  <p class="topless"><a href="checks.html"
+                        title="下一章">系统检查框架</a></p>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/applications.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="转向" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">8月 11, 2020</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="API参考">previous</a>
+     |
+    <a href="index.html" title="API参考" accesskey="U">up</a>
+   |
+    <a href="checks.html" title="系统检查框架">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

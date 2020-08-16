@@ -1,0 +1,685 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh_Hans">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>The Django template language &#8212; Django 3.1.1.dev 文档</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="Built-in template tags and filters" href="builtins.html" />
+    <link rel="prev" title="模板" href="index.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 3.1.1.dev 文档</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="模板">previous</a>
+     |
+    <a href="../index.html" title="API参考" accesskey="U">up</a>
+   |
+    <a href="builtins.html" title="Built-in template tags and filters">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-templates-language">
+            
+  <div class="section" id="s-the-django-template-language">
+<span id="the-django-template-language"></span><h1>The Django template language<a class="headerlink" href="#the-django-template-language" title="永久链接至标题">¶</a></h1>
+<p>本文档介绍了Django模板系统语言的语法. 如果你希望从一个更技术的角度来看它是如何工作的和如何扩展它, 请参阅 <a class="reference internal" href="api.html"><span class="doc">The Django template language: for Python programmers</span></a>.</p>
+<p>Django's template language is designed to strike a balance between power and
+ease. It's designed to feel comfortable to those used to working with HTML. If
+you have any exposure to other text-based template languages, such as <a class="reference external" href="https://www.smarty.net/">Smarty</a>
+or <a class="reference external" href="https://palletsprojects.com/p/jinja/">Jinja2</a>, you should feel right at home with Django's templates.</p>
+<div class="admonition-philosophy admonition">
+<p class="first admonition-title">设计哲学</p>
+<p>如果你有编程背景,或者你使用过PHP等嵌入HTML的程序语言,你要牢记, Django的模板系统是不是简单的把Python嵌入到HTML中. 它的设计是: 模板系统旨在展示内容, 而不是程序逻辑.</p>
+<p class="last">jango的模板系统提供的标签, 其功能类似于一些编程结构 -- <a class="reference internal" href="builtins.html#std:templatetag-if"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">if</span></code></a> 标签用于布尔值测试, <a class="reference internal" href="builtins.html#std:templatetag-for"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">for</span></code></a> 标签用来做for循环, 等等.但这些都不是简单的执行相应的Python代码,模板系统不会执行任意的Python表达式. 通常情况下, 模板系统仅支持接下来列出的这些标签和过滤 (仅当需要时你可以添加 <a class="reference internal" href="../../howto/custom-template-tags.html"><span class="doc">你自己的扩展</span></a> 到模板语法中).</p>
+</div>
+<div class="section" id="s-templates">
+<span id="templates"></span><h2>模板<a class="headerlink" href="#templates" title="永久链接至标题">¶</a></h2>
+<p>A template is a text file. It can generate any text-based format (HTML, XML,
+CSV, etc.).</p>
+<p>模板中包含的 <strong>变量</strong> 被替换为变量的值, <strong>标签</strong> 被替换为相应的模板控制逻辑.</p>
+<p>Below is a minimal template that illustrates a few basics. Each element will be
+explained later in this document.</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;base_generic.html&quot;</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}{{</span> <span class="nv">section.title</span> <span class="cp">}}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">section.title</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">story</span> <span class="k">in</span> <span class="nv">story_list</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">story.get_absolute_url</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">story.headline</span><span class="o">|</span><span class="nf">upper</span> <span class="cp">}}</span>
+  <span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">story.tease</span><span class="o">|</span><span class="nf">truncatewords</span><span class="s2">:&quot;100&quot;</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<div class="admonition-philosophy admonition">
+<p class="first admonition-title">设计哲学</p>
+<p class="last">Why use a text-based template instead of an XML-based one (like Zope's
+TAL)? We wanted Django's template language to be usable for more than
+just XML/HTML templates. You can use the template language for any
+text-based format such as emails, JavaScript and CSV.</p>
+</div>
+</div>
+<div class="section" id="s-variables">
+<span id="s-template-variables"></span><span id="variables"></span><span id="template-variables"></span><h2>变量<a class="headerlink" href="#variables" title="永久链接至标题">¶</a></h2>
+<p>Variables look like this: <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">variable</span> <span class="pre">}}</span></code>. When the template engine
+encounters a variable, it evaluates that variable and replaces it with the
+result. Variable names consist of any combination of alphanumeric characters
+and the underscore (<code class="docutils literal notranslate"><span class="pre">&quot;_&quot;</span></code>) but may not start with an underscore. The dot
+(<code class="docutils literal notranslate"><span class="pre">&quot;.&quot;</span></code>) also appears in variable sections, although that has a special
+meaning, as indicated below. Importantly, <em>you cannot have spaces or
+punctuation characters in variable names.</em></p>
+<p>使用点 (<code class="docutils literal notranslate"><span class="pre">.</span></code>) 来访问变量的属性.</p>
+<div class="admonition-behind-the-scenes admonition">
+<p class="first admonition-title">幕后</p>
+<p>从技术上讲,当模板系统遇到一个点,它会尝试下面的动作,顺序如下:</p>
+<ul class="simple">
+<li>字典查询</li>
+<li>Attribute or method lookup</li>
+<li>Numeric index lookup</li>
+</ul>
+<p>If the resulting value is callable, it is called with no arguments. The
+result of the call becomes the template value.</p>
+<p>This lookup order can cause some unexpected behavior with objects that
+override dictionary lookup. For example, consider the following code snippet
+that attempts to loop over a <code class="docutils literal notranslate"><span class="pre">collections.defaultdict</span></code>:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">k</span><span class="o">,</span> <span class="nv">v</span> <span class="k">in</span> <span class="nv">defaultdict.items</span> <span class="cp">%}</span>
+    Do something with k and v here...
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p class="last">Because dictionary lookup happens first, that behavior kicks in and provides
+a default value instead of using the intended <code class="docutils literal notranslate"><span class="pre">.items()</span></code> method. In this
+case, consider converting to a dictionary first.</p>
+</div>
+<p>在上面的例子中, <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">section.title</span> <span class="pre">}}</span></code> 将被替换为这个对象的title属性值.</p>
+<p>If you use a variable that doesn't exist, the template system will insert the
+value of the <code class="docutils literal notranslate"><span class="pre">string_if_invalid</span></code> option, which is set to <code class="docutils literal notranslate"><span class="pre">''</span></code> (the empty
+string) by default.</p>
+<p>Note that &quot;bar&quot; in a template expression like <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">foo.bar</span> <span class="pre">}}</span></code> will be
+interpreted as a literal string and not using the value of the variable &quot;bar&quot;,
+if one exists in the template context.</p>
+<p>Variable attributes that begin with an underscore may not be accessed as
+they're generally considered private.</p>
+</div>
+<div class="section" id="s-filters">
+<span id="filters"></span><h2>过滤器<a class="headerlink" href="#filters" title="永久链接至标题">¶</a></h2>
+<p>您可以通过使用 <strong>过滤器</strong> 修改变量的显示.</p>
+<p>过滤器用起来像这样： <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">name|lower</span> <span class="pre">}}</span></code> . 通过过滤器 <a class="reference internal" href="builtins.html#std:templatefilter-lower"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">lower</span></code></a> 变量 <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">name</span> <span class="pre">}}</span></code> 变为了小写字符. 通过管道符 (<code class="docutils literal notranslate"><span class="pre">|</span></code>) 间隔变量和过滤器来使用过滤器.</p>
+<p>过滤器可以是 &quot;链式的&quot;. 一个过滤器的输出作为下一个过滤器的输入. <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">text|escape|linebreaks</span> <span class="pre">}}</span></code> 是一种常用的转换方式, 在这之后换行符被替换为了 <code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code> 标签.</p>
+<p>有些过滤器是带有参数的. 一个带参数的过滤器看起来像这样: <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">bio|truncatewords:30</span> <span class="pre">}}</span></code>. 他会显示 <code class="docutils literal notranslate"><span class="pre">bio</span></code> 变量的前30个字符.</p>
+<p>Filter arguments that contain spaces must be quoted; for example, to join a
+list with commas and spaces you'd use <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">list|join:&quot;,</span> <span class="pre">&quot;</span> <span class="pre">}}</span></code>.</p>
+<p>Django provides about sixty built-in template filters. You can read all about
+them in the <a class="reference internal" href="builtins.html#ref-templates-builtins-filters"><span class="std std-ref">built-in filter reference</span></a>.
+To give you a taste of what's available, here are some of the more commonly
+used template filters:</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="builtins.html#std:templatefilter-default"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">default</span></code></a></dt>
+<dd><p class="first">If a variable is false or empty, use given default. Otherwise, use the
+value of the variable. For example:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">default</span><span class="s2">:&quot;nothing&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p class="last">如果 <code class="docutils literal notranslate"><span class="pre">value</span></code> 没有提供或者为空，那么他将显示为 &quot;<code class="docutils literal notranslate"><span class="pre">nothing</span></code>&quot; .</p>
+</dd>
+<dt><a class="reference internal" href="builtins.html#std:templatefilter-length"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">length</span></code></a></dt>
+<dd><p class="first">Returns the length of the value. This works for both strings and lists.
+For example:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p class="last">如果 <code class="docutils literal notranslate"><span class="pre">value</span></code> 为 <code class="docutils literal notranslate"><span class="pre">['a',</span> <span class="pre">'b',</span> <span class="pre">'c',</span> <span class="pre">'d']</span></code>, 那么他将被显示为 <code class="docutils literal notranslate"><span class="pre">4</span></code>.</p>
+</dd>
+<dt><a class="reference internal" href="builtins.html#std:templatefilter-filesizeformat"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">filesizeformat</span></code></a></dt>
+<dd><p class="first">Formats the value like a &quot;human-readable&quot; file size (i.e. <code class="docutils literal notranslate"><span class="pre">'13</span> <span class="pre">KB'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'4.1</span> <span class="pre">MB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'102</span> <span class="pre">bytes'</span></code>, etc.). For example:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">filesizeformat</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p class="last">If <code class="docutils literal notranslate"><span class="pre">value</span></code> is 123456789, the output would be <code class="docutils literal notranslate"><span class="pre">117.7</span> <span class="pre">MB</span></code>.</p>
+</dd>
+</dl>
+<p>这些只是几个例子，请参阅  <a class="reference internal" href="builtins.html#ref-templates-builtins-filters"><span class="std std-ref">内置过滤器参考</span></a> 的完整列表.</p>
+<p>您还可以创建自己的自定义模板过滤器，请参见 <a class="reference internal" href="../../howto/custom-template-tags.html"><span class="doc">自定义模板（template）的标签（tags）和过滤器（filters）</span></a>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">参见</p>
+<p class="last">Django的管理界面可以在一个给定的站点中包含所有的模板标签和过滤器的完整参考. 请参阅 <a class="reference internal" href="../contrib/admin/admindocs.html"><span class="doc">The Django admin documentation generator</span></a>.</p>
+</div>
+</div>
+<div class="section" id="s-tags">
+<span id="tags"></span><h2>标签(Tags)<a class="headerlink" href="#tags" title="永久链接至标题">¶</a></h2>
+<p>标签看起来像这样: <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">tag</span> <span class="pre">%}</span></code>. 标签要比变量更复杂: 有些标签会创建一段文本, 有些标签会控制输出流的方式比如循环或逻辑条件, 还有些标签会添加一些扩展内容到模板中, 比如另外的标签和过滤器.</p>
+<p>有些标签在使用时需要有开始和结束标签 (像这样 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">tag</span> <span class="pre">%}</span> <span class="pre">...</span> <span class="pre">内容</span> <span class="pre">...</span> <span class="pre">{%</span> <span class="pre">endtag</span> <span class="pre">%}</span></code>).</p>
+<p>Django内置了大约二十几个标签. 你可以在 <a class="reference internal" href="builtins.html#ref-templates-builtins-tags"><span class="std std-ref">内置标签参考</span></a> 阅读有关内置标签的内容. 为了让你尝试有什么可用的, 这里有一些常用标签的例子:</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="builtins.html#std:templatetag-for"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">for</span></code></a></dt>
+<dd><p class="first">循环数组中的每个元素.  比如, 显示列表 <code class="docutils literal notranslate"><span class="pre">athlete_list</span></code> 中每个元素的 <code class="docutils literal notranslate"><span class="pre">name</span></code> 属性:</p>
+<div class="last highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">athlete</span> <span class="k">in</span> <span class="nv">athlete_list</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">athlete.name</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd>
+<dt><a class="reference internal" href="builtins.html#std:templatetag-if"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">if</span></code></a>, <code class="docutils literal notranslate"><span class="pre">elif</span></code>, and <code class="docutils literal notranslate"><span class="pre">else</span></code></dt>
+<dd><p class="first">判断一个变量的布尔值, 如果它为 &quot;true&quot; 则显示 <code class="docutils literal notranslate"><span class="pre">if</span></code> 块儿内的内容, 否则显示 <code class="docutils literal notranslate"><span class="pre">else</span></code> 块儿内的文字:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span> <span class="cp">%}</span>
+    Number of athletes: <span class="cp">{{</span> <span class="nv">athlete_list</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">elif</span> <span class="nv">athlete_in_locker_room_list</span> <span class="cp">%}</span>
+    Athletes should be out of the locker room soon!
+<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
+    No athletes.
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>In the above, if <code class="docutils literal notranslate"><span class="pre">athlete_list</span></code> is not empty, the number of athletes
+will be displayed by the <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">athlete_list|length</span> <span class="pre">}}</span></code> variable. Otherwise,
+if <code class="docutils literal notranslate"><span class="pre">athlete_in_locker_room_list</span></code> is not empty, the message &quot;Athletes
+should be out...&quot; will be displayed. If both lists are empty,
+&quot;No athletes.&quot; will be displayed.</p>
+<p>也可以在 <a class="reference internal" href="builtins.html#std:templatetag-if"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">if</span></code></a> 标签里使用过滤器和各种操作符:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span><span class="o">|</span><span class="nf">length</span> <span class="o">&gt;</span> <span class="m">1</span> <span class="cp">%}</span>
+   Team: <span class="cp">{%</span> <span class="k">for</span> <span class="nv">athlete</span> <span class="k">in</span> <span class="nv">athlete_list</span> <span class="cp">%}</span> ... <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
+   Athlete: <span class="cp">{{</span> <span class="nv">athlete_list.0.name</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p class="last">While the above example works, be aware that most template filters return
+strings, so mathematical comparisons using filters will generally not work
+as you expect. <a class="reference internal" href="builtins.html#std:templatefilter-length"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">length</span></code></a> is an exception.</p>
+</dd>
+<dt><a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> and <a class="reference internal" href="builtins.html#std:templatetag-extends"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">extends</span></code></a></dt>
+<dd>请看 <a class="reference internal" href="#id1">模板继承</a> (在下面), 一个强大的方法, 在模板上切割下来的&quot;样板&quot;.</dd>
+</dl>
+<p>以上的例子只是整个标签列表的一小部分; 请参看 <a class="reference internal" href="builtins.html#ref-templates-builtins-tags"><span class="std std-ref">内置标签参考</span></a> 完整阅览.</p>
+<p>您还可以创建自己的自定义模板标签, 请参看 <a class="reference internal" href="../../howto/custom-template-tags.html"><span class="doc">自定义模板（template）的标签（tags）和过滤器（filters）</span></a>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">参见</p>
+<p class="last">Django的管理界面可以在一个给定的站点中包含所有的模板标签和过滤器的完整参考. 请参阅 <a class="reference internal" href="../contrib/admin/admindocs.html"><span class="doc">The Django admin documentation generator</span></a>.</p>
+</div>
+</div>
+<div class="section" id="s-comments">
+<span id="s-template-comments"></span><span id="comments"></span><span id="template-comments"></span><h2>注释(Comments)<a class="headerlink" href="#comments" title="永久链接至标题">¶</a></h2>
+<p>要注释掉行的一部分,在模板中使用注释语法: <code class="docutils literal notranslate"><span class="pre">{#</span> <span class="pre">#}</span></code>.</p>
+<p>例如,该模板将呈现为 <code class="docutils literal notranslate"><span class="pre">'hello'</span></code>:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="c">{# greeting #}</span>hello
+</pre></div>
+</div>
+<p>注释可以包含任何模板代码, 使其生效或无效. 例如:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="c">{# {% if foo %}bar{% else %} #}</span>
+</pre></div>
+</div>
+<p>这个语法只能用于单行注释 (不允许在 <code class="docutils literal notranslate"><span class="pre">{#</span></code> 和 <code class="docutils literal notranslate"><span class="pre">#}</span></code> 之间换行). 如果您需要注释掉多行部分的模板, 参见 <a class="reference internal" href="builtins.html#std:templatetag-comment"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">comment</span></code></a> 标签.</p>
+</div>
+<div class="section" id="s-template-inheritance">
+<span id="s-id1"></span><span id="template-inheritance"></span><span id="id1"></span><h2>模板继承<a class="headerlink" href="#template-inheritance" title="永久链接至标题">¶</a></h2>
+<p>Django模板中最强大和最复杂的部分就是模板继承. 模板继承允许你建立一个基本的&quot;骨架&quot;模板, 它包含了你网站所有常见的元素,并定义了可以被子模板覆盖的 <strong>块(blocks)</strong> .</p>
+<p>Let's look at template inheritance by starting with an example:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;style.css&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span>My amazing site<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;sidebar&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">block</span> <span class="nv">sidebar</span> <span class="cp">%}</span>
+        <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/blog/&quot;</span><span class="p">&gt;</span>Blog<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;content&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>This template, which we'll call <code class="docutils literal notranslate"><span class="pre">base.html</span></code>, defines an HTML skeleton
+document that you might use for a two-column page. It's the job of &quot;child&quot;
+templates to fill the empty blocks with content.</p>
+<p>在这个例子中, <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> 标签定义了三个可以被子模板填充的块. <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> 标签告诉了模板系统哪些地方可能被子模板覆盖.</p>
+<p>一个子模板可能看起来像这样:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;base.html&quot;</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span>My amazing blog<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">entry</span> <span class="k">in</span> <span class="nv">blog_entries</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">entry.title</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">entry.body</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="builtins.html#std:templatetag-extends"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">extends</span></code></a> 标签是这里的关键. 它告诉模板系统这个模板继承了另外的模板. 当模板系统对此模板进行运算, 首先会寻找他的父模板 -- 在这里是&quot;base.html&quot;.</p>
+<p>在这一点上, 模板引擎会在 <code class="docutils literal notranslate"><span class="pre">base.html</span></code> 中发现三个 <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> 标签, 并且使用子模板的内容替换掉这些块. 根据变量 <code class="docutils literal notranslate"><span class="pre">blog_entries</span></code> 的值, 输出可能看起来像这样:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;style.css&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>My amazing blog<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;sidebar&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/&quot;</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/blog/&quot;</span><span class="p">&gt;</span>Blog<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;content&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Entry one<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>This is my first entry.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+
+        <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Entry two<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>This is my second entry.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>需要注意的是, 因为子模板没有定义 <code class="docutils literal notranslate"><span class="pre">sidebar</span></code> 块, 那么父模板的内容就会被使用. 通常来说, 父模板 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code> 中的内容会被作为备用的内容.</p>
+<p>在你需要时, 可以有多个层次的继承关系. 使用模板继承的一个常用方案是像以下的三层继承.</p>
+<ul class="simple">
+<li>创建一个 <code class="docutils literal notranslate"><span class="pre">base.html</span></code> 模板把控你网站的整体风格.</li>
+<li>为网站的每个子分类创建一个 <code class="docutils literal notranslate"><span class="pre">base_SECTIONNAME.html</span></code> 模板. 比如, <code class="docutils literal notranslate"><span class="pre">base_news.html</span></code>, <code class="docutils literal notranslate"><span class="pre">base_sports.html</span></code>. 这些模板都继承 <code class="docutils literal notranslate"><span class="pre">base.html</span></code> 模板. 这些模板中包含特定的设计/风格.</li>
+<li>为每一种类型的页面创建一个模板, 比如 <code class="docutils literal notranslate"><span class="pre">news</span></code> <code class="docutils literal notranslate"><span class="pre">article</span></code> 或 <code class="docutils literal notranslate"><span class="pre">blog</span></code> 内容. 这些模板扩展上一级模板的相应分类.</li>
+</ul>
+<p>This approach maximizes code reuse and helps to add items to shared content
+areas, such as section-wide navigation.</p>
+<p>这里有一些关于模板继承的提示</p>
+<ul>
+<li><p class="first">如果你在模板中使用 <a class="reference internal" href="builtins.html#std:templatetag-extends"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">extends</span> <span class="pre">%}</span></code></a>, 他必须位于模板的最开始. 如果在其他的部分声明, 则不生效.</p>
+</li>
+<li><p class="first">在你的基础模板中使用更多的 <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code></a> 是一个好的方法. 请记住, 子模板不需要定义所有父模板中的块, 所以你可以在若干的块中填充默认值, 然后定义之后需要的块. 有更多的可用块总是更好的.</p>
+</li>
+<li><p class="first">如果你发现自己在许多模板中有重复内容的了, 这可能意味着你要移动这些内容到父模板的 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code> 中.</p>
+</li>
+<li><p class="first">如果你需要得到父模板块中的内容, 可以用 <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">block.super</span> <span class="pre">}}</span></code> 变量. 这在你想使用父模板块中的内容又想在其中追加内容时是非常有用的. 使用 <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">block.super</span> <span class="pre">}}</span></code> 插入的数据不会被自动转义 (参见 <a class="reference external" href="#automatic-html-escaping">下一节</a>), 因为它已经被转义了. 如果需要转义, 可以在父模板中转义.</p>
+</li>
+<li><p class="first">By using the same template name as you are inheriting from,
+<a class="reference internal" href="builtins.html#std:templatetag-extends"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">extends</span> <span class="pre">%}</span></code></a> can be used to inherit a template at the same
+time as overriding it. Combined with <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">block.super</span> <span class="pre">}}</span></code>, this can be a
+powerful way to make small customizations. See
+<a class="reference internal" href="../../howto/overriding-templates.html#extending-an-overridden-template"><span class="std std-ref">Extending an overridden template</span></a> in the <em>Overriding templates</em> How-to
+for a full example.</p>
+</li>
+<li><p class="first">Variables created outside of a <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code></a> using the template
+tag <code class="docutils literal notranslate"><span class="pre">as</span></code> syntax can't be used inside the block. For example, this template
+doesn't render anything:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">translate</span> <span class="s2">&quot;Title&quot;</span> <span class="k">as</span> <span class="nv">title</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}{{</span> <span class="nv">title</span> <span class="cp">}}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">更好的可读性, 你可以给 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endblock</span> <span class="pre">%}</span></code> 标签定义一个 <em>名字</em>. 比如:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+...
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="nv">content</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>在一个较长的模板中, 这个方法可以让你知道是哪一个 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code> 标签定义结束了.</p>
+</li>
+</ul>
+<p>最后请注意, 你不能在同一模板中定义多个具有相同名称的块标签. 存在这个限制是因为 <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> 标签是&quot;双向&quot;定义的. 也就是说, 它不仅指定了子模板要填充哪个&quot;洞&quot;, 也说明了子模板要引用那些父模板的内容. 所以在有多个同名 <a class="reference internal" href="builtins.html#std:templatetag-block"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">block</span></code></a> 标签时, 父模板就不知道到底要引用哪个块的内容了.</p>
+</div>
+<div class="section" id="s-automatic-html-escaping">
+<span id="s-id2"></span><span id="automatic-html-escaping"></span><span id="id2"></span><h2>自动HTML转义<a class="headerlink" href="#automatic-html-escaping" title="永久链接至标题">¶</a></h2>
+<p>从模板生成HTML时, 总是有一种风险, 即一个变量将会影响生成的HTML字符. 例如, 考虑这个模板片段:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Hello, <span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>At first, this seems like a harmless way to display a user's name, but consider
+what would happen if the user entered their name as this:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>当名字为这个值, 该模板将呈现为:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Hello, <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>...这意味着浏览器将弹出一个JavaScript警告框!</p>
+<p>同样的, 如果名字中包含一个 <code class="docutils literal notranslate"><span class="pre">'&lt;'</span></code> 符号, 像这样:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>username
+</pre></div>
+</div>
+<p>这将导致呈现出这样的模板:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Hello, <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>username
+</pre></div>
+</div>
+<p>...这意味着在此之后的文字将呈现为粗体!</p>
+<p>显然, 用户提交的数据是不可靠的且不应被直接插入到您的网页, 因为恶意用户可以使用这种潜在的漏洞做不好的事情. 这种类型的安全漏洞被称为 <a class="reference external" href="https://en.wikipedia.org/wiki/Cross-site_scripting">Cross Site Scripting (跨站脚本)</a> (XSS) 攻击.</p>
+<p>为了避免这个问题, 你有两种选择:</p>
+<ul class="simple">
+<li>一, 确保让不受信任的变量经过了 <a class="reference internal" href="builtins.html#std:templatefilter-escape"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">escape</span></code></a> 过滤器 (下文介绍), 将危险的HTML字符替换为无害的HTML转义字符. 这在Django最初时是默认的方案, 它使得 <em>你</em>, 开发者, 有责任确保在必要时转义了变量. 但是人们很容易忽略它.</li>
+<li>二, 你可以用Django的自动HTML转义. 本节的其余部分介绍了自动转义如何工作.</li>
+</ul>
+<p>在Django中, 默认每个模板会自动转义输出的每一个变量标签. 具体来说, 这五个字符会被转义:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&lt;</span></code> 被替换为 <code class="docutils literal notranslate"><span class="pre">&amp;lt;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> 被替换为 <code class="docutils literal notranslate"><span class="pre">&amp;gt;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'</span></code> (single quote) is converted to <code class="docutils literal notranslate"><span class="pre">&amp;#x27;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> (双引号) 被替换为 <code class="docutils literal notranslate"><span class="pre">&amp;quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">&amp;</span></code> 被替换为 <code class="docutils literal notranslate"><span class="pre">&amp;amp;</span></code></li>
+</ul>
+<p>再次强调, 这种行为是默认的. 如果你使用的是Django的模板系统, 你是受保护的.</p>
+<div class="section" id="s-how-to-turn-it-off">
+<span id="how-to-turn-it-off"></span><h3>如何关闭它<a class="headerlink" href="#how-to-turn-it-off" title="永久链接至标题">¶</a></h3>
+<p>如果你不希望数据被自动转义, 你可以在站点, 模板, 变量这三个层面关闭它.</p>
+<p>为什么你会想要把它关掉? 因为有时候, 你希望把模板变量中包含的数据作为原始的HTML渲染, 在这种情况下, 你不希望自己的内容被转义. 例如, 你可能在你的数据库的BLOB字段存储HTML, 并希望直接嵌入到您的模板. 或者你使用Django的模板系统生成不是HTML的文本 -- 比如电子邮件正文.</p>
+<div class="section" id="s-for-individual-variables">
+<span id="for-individual-variables"></span><h4>对于单个变量<a class="headerlink" href="#for-individual-variables" title="永久链接至标题">¶</a></h4>
+<p>要为一个单独的变量禁用自动转义, 使用 <a class="reference internal" href="builtins.html#std:templatefilter-safe"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">safe</span></code></a> 过滤器:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>This will be escaped: <span class="cp">{{</span> <span class="nv">data</span> <span class="cp">}}</span>
+This will not be escaped: <span class="cp">{{</span> <span class="nv">data</span><span class="o">|</span><span class="nf">safe</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p><em>safe</em> 可以被认为是 <em>safe from further escaping</em> 或 <em>can be safely interpreted as HTML</em> 的简写. 在这个例子中, 如果 <code class="docutils literal notranslate"><span class="pre">data</span></code> 是 <code class="docutils literal notranslate"><span class="pre">'&lt;b&gt;'</span></code>, 那么输出将会是:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>This will be escaped: <span class="ni">&amp;lt;</span>b<span class="ni">&amp;gt;</span>
+This will not be escaped: <span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="s-for-template-blocks">
+<span id="for-template-blocks"></span><h4>对于模板文本块<a class="headerlink" href="#for-template-blocks" title="永久链接至标题">¶</a></h4>
+<p>To control auto-escaping for a template, wrap the template (or a particular
+section of the template) in the <a class="reference internal" href="builtins.html#std:templatetag-autoescape"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">autoescape</span></code></a> tag, like so:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">autoescape</span> <span class="nv">off</span> <span class="cp">%}</span>
+    Hello <span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endautoescape</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="builtins.html#std:templatetag-autoescape"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">autoescape</span></code></a> 标签接受 <code class="docutils literal notranslate"><span class="pre">on</span></code> 或 <code class="docutils literal notranslate"><span class="pre">off</span></code> 作为参数. 有时, 你希望自动转义在某个区域被禁用. 如这个模板的例子:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Auto-escaping is on by default. Hello <span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span>
+
+<span class="cp">{%</span> <span class="k">autoescape</span> <span class="nv">off</span> <span class="cp">%}</span>
+    This will not be auto-escaped: <span class="cp">{{</span> <span class="nv">data</span> <span class="cp">}}</span>.
+
+    Nor this: <span class="cp">{{</span> <span class="nv">other_data</span> <span class="cp">}}</span>
+    <span class="cp">{%</span> <span class="k">autoescape</span> <span class="nv">on</span> <span class="cp">%}</span>
+        Auto-escaping applies again: <span class="cp">{{</span> <span class="nv">name</span> <span class="cp">}}</span>
+    <span class="cp">{%</span> <span class="k">endautoescape</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endautoescape</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>The auto-escaping tag passes its effect onto templates that extend the
+current one as well as templates included via the <a class="reference internal" href="builtins.html#std:templatetag-include"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">include</span></code></a> tag,
+just like all block tags. For example:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">base.html</span><a class="headerlink" href="#id4" title="永久链接至代码">¶</a></div>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">autoescape</span> <span class="nv">off</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endautoescape</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">child.html</span><a class="headerlink" href="#id5" title="永久链接至代码">¶</a></div>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;base.html&quot;</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">title</span> <span class="cp">%}</span>This <span class="ni">&amp;amp;</span> that<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}{{</span> <span class="nv">greeting</span> <span class="cp">}}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</div>
+<p>由于自动转义在base模板中被关闭了, 所以在子模板中他也是被关闭了的, 导致了在呈现HTML时, <code class="docutils literal notranslate"><span class="pre">greeting</span></code> 变量被输出为 <code class="docutils literal notranslate"><span class="pre">&lt;b&gt;Hello!&lt;/b&gt;</span></code>:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>This <span class="ni">&amp;amp;</span> that<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">b</span><span class="p">&gt;</span>Hello!<span class="p">&lt;/</span><span class="nt">b</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="s-notes">
+<span id="notes"></span><h3>注意<a class="headerlink" href="#notes" title="永久链接至标题">¶</a></h3>
+<p>一般情况下, 模板的开发者并不需要对自动转义太过关注. 这是编写Python的开发者 (写视图和写自定义模板标签的人) 需要考虑的事. 所以, 你只需要做和模板有关的活.</p>
+<p>如果你不确定模板在何时会进行自动转义(或不进行), 那么就向所有需要转义的变量添加 <a class="reference internal" href="builtins.html#std:templatefilter-escape"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">escape</span></code></a> 过滤器. 当自动转义被打开, 这么做不会有任何问题, <a class="reference internal" href="builtins.html#std:templatefilter-escape"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">escape</span></code></a> 过滤器不会再次转义 -- <a class="reference internal" href="builtins.html#std:templatefilter-escape"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">escape</span></code></a> 过滤器不会影响自动转义的变量.</p>
+</div>
+<div class="section" id="s-string-literals-and-automatic-escaping">
+<span id="s-id3"></span><span id="string-literals-and-automatic-escaping"></span><span id="id3"></span><h3>字符串和自动转义<a class="headerlink" href="#string-literals-and-automatic-escaping" title="永久链接至标题">¶</a></h3>
+<p>正如我们前面提到的, 过滤器参数可以是字符串:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">data</span><span class="o">|</span><span class="nf">default</span><span class="s2">:&quot;This is a string literal.&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>这些作为过滤器参数的字符串 <strong>都不经过</strong> 自动转义, 他们是被认为经过了 <a class="reference internal" href="builtins.html#std:templatefilter-safe"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">safe</span></code></a> 过滤器的. 这么做的原因是, 模板的开发者是在控制字符的输出, 所以他们能确保正确的使用转义后的HTML字面值.</p>
+<p>这意味着你应当这么写</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">data</span><span class="o">|</span><span class="nf">default</span><span class="s2">:&quot;3 &amp;lt; 2&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>...rather than:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">data</span><span class="o">|</span><span class="nf">default</span><span class="s2">:&quot;3 &lt; 2&quot;</span> <span class="cp">}}</span>  <span class="c">{# Bad! Don&#39;t do this. #}</span>
+</pre></div>
+</div>
+<p>这不会影响来自变量本身的数据. 如果必要, 变量本身仍会被自动转义, 因为他们无法控制的模板作者.</p>
+</div>
+</div>
+<div class="section" id="s-accessing-method-calls">
+<span id="s-template-accessing-methods"></span><span id="accessing-method-calls"></span><span id="template-accessing-methods"></span><h2>访问方法调用<a class="headerlink" href="#accessing-method-calls" title="永久链接至标题">¶</a></h2>
+<p>大多附加到对象上的方法都可以在模板中被调用.这意味着模板可以从视图中传递过来变量中获得对象属性之外的值.例如, Django ORM 提供了 <a class="reference internal" href="../../topics/db/queries.html#topics-db-queries-related"><span class="std std-ref">&quot;entry_set&quot;</span></a> 语法寻找一个外键所关联的对象的集合. 因此, 架设一个叫 &quot;comment&quot; 的模型有外键指向了模型 &quot;task&quot;,你可以通过给定一个实际的 task , 像这样循环输出它所有的 comment:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">comment</span> <span class="k">in</span> <span class="nv">task.comment_set.all</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">comment</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>同样, <a class="reference internal" href="../models/querysets.html"><span class="doc">QuerySets</span></a> 提供了一个 <code class="docutils literal notranslate"><span class="pre">count()</span></code> 方法来统计它所包含的对象数目. 因此, 您可以得到当前 task 相关的所有 comment 的数目:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">task.comment_set.all.count</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>You can also access methods you've explicitly defined on your own models:</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">models.py</span><a class="headerlink" href="#id6" title="永久链接至代码">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Task</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;bar&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">template.html</span><a class="headerlink" href="#id7" title="永久链接至代码">¶</a></div>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">task.foo</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</div>
+<p>由于Django有意限制了模板中语言逻辑的处理, 所以不能在模板内调用方法时传递参数. 数据应当在视图中计算, 然后再传递给模板.</p>
+</div>
+<div class="section" id="s-custom-tag-and-filter-libraries">
+<span id="s-loading-custom-template-libraries"></span><span id="custom-tag-and-filter-libraries"></span><span id="loading-custom-template-libraries"></span><h2>自定义标签和过滤器库<a class="headerlink" href="#custom-tag-and-filter-libraries" title="永久链接至标题">¶</a></h2>
+<p>Certain applications provide custom tag and filter libraries. To access them in
+a template, ensure the application is in <a class="reference internal" href="../settings.html#std:setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> (we'd add
+<code class="docutils literal notranslate"><span class="pre">'django.contrib.humanize'</span></code> for this example), and then use the <a class="reference internal" href="builtins.html#std:templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">load</span></code></a>
+tag in a template:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">humanize</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="m">45000</span><span class="o">|</span><span class="nf">intcomma</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>In the above, the <a class="reference internal" href="builtins.html#std:templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">load</span></code></a> tag loads the <code class="docutils literal notranslate"><span class="pre">humanize</span></code> tag library, which then
+makes the <code class="docutils literal notranslate"><span class="pre">intcomma</span></code> filter available for use. If you've enabled
+<a class="reference internal" href="../contrib/admin/admindocs.html#module-django.contrib.admindocs" title="django.contrib.admindocs: Django's admin documentation generator."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.admindocs</span></code></a>, you can consult the documentation area in your
+admin to find the list of custom libraries in your installation.</p>
+<p>The <a class="reference internal" href="builtins.html#std:templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">load</span></code></a> tag can take multiple library names, separated by spaces.
+Example:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">humanize</span> <span class="nv">i18n</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>请参考 <a class="reference internal" href="../../howto/custom-template-tags.html"><span class="doc">自定义模板（template）的标签（tags）和过滤器（filters）</span></a> 以获得更多的有关自定义标签的内容.</p>
+<div class="section" id="s-custom-libraries-and-template-inheritance">
+<span id="custom-libraries-and-template-inheritance"></span><h3>自定义库和模板继承<a class="headerlink" href="#custom-libraries-and-template-inheritance" title="永久链接至标题">¶</a></h3>
+<p>当你加载一个自定义标签和过滤器库, 这些被加载的标签/过滤器只能在当前模板中使用 -- 其他与此模板有继承关系的(父/子)模板均不能使用这些标签/过滤器.</p>
+<p>For example, if a template <code class="docutils literal notranslate"><span class="pre">foo.html</span></code> has <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">humanize</span> <span class="pre">%}</span></code>, a child
+template (e.g., one that has <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">extends</span> <span class="pre">&quot;foo.html&quot;</span> <span class="pre">%}</span></code>) will <em>not</em> have
+access to the humanize template tags and filters. The child template is
+responsible for its own <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">humanize</span> <span class="pre">%}</span></code>.</p>
+<p>这是因为这能使模板更健全且更好维护.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">参见</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="index.html"><span class="doc">The Templates Reference</span></a></dt>
+<dd>Covers built-in tags, built-in filters, using an alternative template
+language, and more.</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../contents.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Django template language</a><ul>
+<li><a class="reference internal" href="#templates">模板</a></li>
+<li><a class="reference internal" href="#variables">变量</a></li>
+<li><a class="reference internal" href="#filters">过滤器</a></li>
+<li><a class="reference internal" href="#tags">标签(Tags)</a></li>
+<li><a class="reference internal" href="#comments">注释(Comments)</a></li>
+<li><a class="reference internal" href="#template-inheritance">模板继承</a></li>
+<li><a class="reference internal" href="#automatic-html-escaping">自动HTML转义</a><ul>
+<li><a class="reference internal" href="#how-to-turn-it-off">如何关闭它</a><ul>
+<li><a class="reference internal" href="#for-individual-variables">对于单个变量</a></li>
+<li><a class="reference internal" href="#for-template-blocks">对于模板文本块</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notes">注意</a></li>
+<li><a class="reference internal" href="#string-literals-and-automatic-escaping">字符串和自动转义</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#accessing-method-calls">访问方法调用</a></li>
+<li><a class="reference internal" href="#custom-tag-and-filter-libraries">自定义标签和过滤器库</a><ul>
+<li><a class="reference internal" href="#custom-libraries-and-template-inheritance">自定义库和模板继承</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>上一个主题</h4>
+  <p class="topless"><a href="index.html"
+                        title="上一章">模板</a></p>
+  <h4>下一个主题</h4>
+  <p class="topless"><a href="builtins.html"
+                        title="下一章">Built-in template tags and filters</a></p>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/templates/language.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="转向" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">8月 11, 2020</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="模板">previous</a>
+     |
+    <a href="../index.html" title="API参考" accesskey="U">up</a>
+   |
+    <a href="builtins.html" title="Built-in template tags and filters">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
